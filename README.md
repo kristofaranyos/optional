@@ -6,15 +6,13 @@
 
 [comment]: # (TODO: add CI job for build and codecov, then add badges for both)
 
-Optional is a go library that adds a wrapper for representing values that might be omitted. 
-
+Optional is a go library that adds a wrapper for representing values that might be omitted.
 
 ## Installation
 
 `$ go get -u github.com/kristofaranyos/optional@latest`
 
 ## Usage
-
 
 ```go
 package main
@@ -43,4 +41,19 @@ func printWithOptional(o optional.T[string]) {
 }
 ```
 
-There are multiple mutator and getter methods defined on the optional type, you can check them in the source code for now (it's simple :) ).
+Try it on the [Go Playground](https://go.dev/play/p/W7UfH8G9PqK).
+
+There are multiple mutator and getter methods defined on the optional type, you can check them in the source code for
+now (it's simple :) ).
+
+## Compatibility
+
+### JSON
+
+The `optional.T` type implements `json.Marshaler` and `json.Unmarshaler` for convenient conversion between Go types and
+JSON.  
+One caveat to this is that the wrapped type also needs to be marshallable in order for this to work.
+
+### Databases
+
+TODO

@@ -1,5 +1,9 @@
 package optional
 
+import (
+	"encoding/json"
+)
+
 type T[Type any] struct {
 	data  Type
 	isSet bool
@@ -26,11 +30,11 @@ func NewPointer[Type any](data *Type) T[Type] {
 	return New[Type](*data)
 }
 
-func (o *T[Type]) IsSet() bool {
+func (o T[Type]) IsSet() bool {
 	return o.isSet
 }
 
-func (o *T[Type]) Get() (Type, bool) {
+func (o T[Type]) Get() (Type, bool) {
 	if !o.isSet {
 		return *new(Type), false
 	}
@@ -38,7 +42,7 @@ func (o *T[Type]) Get() (Type, bool) {
 	return o.data, true
 }
 
-func (o *T[Type]) GetOrZero() Type {
+func (o T[Type]) GetOrZero() Type {
 	if !o.isSet {
 		return *new(Type)
 	}
@@ -46,7 +50,7 @@ func (o *T[Type]) GetOrZero() Type {
 	return o.data
 }
 
-func (o *T[Type]) GetOrElse(elseValue Type) Type {
+func (o T[Type]) GetOrElse(elseValue Type) Type {
 	if !o.isSet {
 		return elseValue
 	}
@@ -54,7 +58,7 @@ func (o *T[Type]) GetOrElse(elseValue Type) Type {
 	return o.data
 }
 
-func (o *T[Type]) GetPointer() *Type {
+func (o T[Type]) GetPointer() *Type {
 	if !o.isSet {
 		return nil
 	}
@@ -70,4 +74,27 @@ func (o *T[Type]) Set(data Type) {
 func (o *T[Type]) Clear() {
 	o.data = *new(Type)
 	o.isSet = false
+}
+
+func (o T[Type]) MarshalJSON() ([]byte, error) {
+	if !o.isSet {
+		return json.Marshal(nil)
+	}
+
+	return json.Marshal(o.data)
+}
+
+func (o *T[Type]) UnmarshalJSON(data []byte) error {
+	if len(data) <= 0 || string(data) == "null" {
+		o.Clear()
+		return nil
+	}
+
+	var val Type
+	if err := json.Unmarshal(data, &val); err != nil {
+		return err
+	}
+
+	o.Set(val)
+	return nil
 }

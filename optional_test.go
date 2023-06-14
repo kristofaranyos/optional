@@ -1,6 +1,8 @@
 package optional
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,6 +15,11 @@ const (
 )
 
 var stringVar = stringVal
+
+type testUserStruct struct {
+	Name         string // Sanity check
+	EmailAddress T[string]
+}
 
 func TestNew(t *testing.T) {
 	t.Run("non-pointer type", func(t *testing.T) {
@@ -193,5 +200,103 @@ func TestT_Clear(t *testing.T) {
 
 		assert.False(t, o.isSet)
 		assert.Equal(t, defaultValueString, o.data)
+	})
+}
+
+func TestT_MarshalJSON(t *testing.T) {
+	t.Run("initialized optional", func(t *testing.T) {
+		t.Run("bare value", func(t *testing.T) {
+			o := New(stringVal)
+
+			data, err := o.MarshalJSON()
+
+			assert.NoError(t, err)
+			assert.Equal(t, fmt.Sprintf("%s%s%s", `"`, stringVal, `"`), string(data))
+		})
+
+		t.Run("value as field in a struct", func(t *testing.T) {
+			user := testUserStruct{
+				Name:         "John Smith",
+				EmailAddress: New(stringVal),
+			}
+
+			data, err := json.Marshal(user)
+
+			assert.NoError(t, err)
+			assert.Equal(t, fmt.Sprintf("%s%s%s", `{"Name":"John Smith","EmailAddress":"`, stringVal, `"}`), string(data))
+		})
+	})
+
+	t.Run("empty optional", func(t *testing.T) {
+		t.Run("bare value", func(t *testing.T) {
+			o := Empty[string]()
+
+			data, err := o.MarshalJSON()
+
+			assert.NoError(t, err)
+			assert.Equal(t, "null", string(data))
+		})
+
+		t.Run("value as field in a struct", func(t *testing.T) {
+			user := testUserStruct{
+				Name:         "John Smith",
+				EmailAddress: Empty[string](),
+			}
+
+			data, err := json.Marshal(user)
+
+			assert.NoError(t, err)
+			assert.Equal(t, `{"Name":"John Smith","EmailAddress":null}`, string(data))
+		})
+	})
+}
+
+func TestT_UnmarshalJSON(t *testing.T) {
+	t.Run("initialized optional", func(t *testing.T) {
+		t.Run("bare value", func(t *testing.T) {
+			jsonValue := fmt.Sprintf("%s%s%s", `"`, stringVal, `"`)
+
+			var o T[string]
+			err := o.UnmarshalJSON([]byte(jsonValue))
+
+			assert.NoError(t, err)
+			assert.True(t, o.isSet)
+			assert.Equal(t, stringVal, o.data)
+		})
+
+		t.Run("value as field in a struct", func(t *testing.T) {
+			jsonValue := fmt.Sprintf("%s%s%s", `{"Name":"John Smith","EmailAddress":"`, stringVal, `"}`)
+
+			var user testUserStruct
+			err := json.Unmarshal([]byte(jsonValue), &user)
+
+			assert.NoError(t, err)
+			assert.True(t, user.EmailAddress.isSet)
+			assert.Equal(t, stringVal, user.EmailAddress.data)
+		})
+	})
+
+	t.Run("empty optional", func(t *testing.T) {
+		t.Run("bare value", func(t *testing.T) {
+			jsonValue := "null"
+
+			var o T[string]
+			err := o.UnmarshalJSON([]byte(jsonValue))
+
+			assert.NoError(t, err)
+			assert.False(t, o.isSet)
+			assert.Equal(t, defaultValueString, o.data)
+		})
+
+		t.Run("value as field in a struct", func(t *testing.T) {
+			jsonValue := `{"Name":"John Smith","EmailAddress":null}`
+
+			var user testUserStruct
+			err := json.Unmarshal([]byte(jsonValue), &user)
+
+			assert.NoError(t, err)
+			assert.False(t, user.EmailAddress.isSet)
+			assert.Equal(t, defaultValueString, user.EmailAddress.data)
+		})
 	})
 }
