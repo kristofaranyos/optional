@@ -1,9 +1,10 @@
 # optional
 
-![License](https://img.shields.io/github/license/kristofaranyos/optional?style=flat-square)
-![Release](https://img.shields.io/github/v/release/kristofaranyos/optional?style=flat-square)
+![License](https://img.shields.io/github/license/kristofaranyos/optional)
+![Release](https://img.shields.io/github/v/release/kristofaranyos/optional)
+[![Go test](https://github.com/kristofaranyos/optional/actions/workflows/test.yml/badge.svg)](https://github.com/kristofaranyos/optional/actions/workflows/test.yml)
 [![Go Coverage](https://github.com/kristofaranyos/optional/wiki/coverage.svg)](https://raw.githack.com/wiki/kristofaranyos/optional/coverage.html)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kristofaranyos/optional?style=flat-square)](https://goreportcard.com/report/github.com/kristofaranyos/optional)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kristofaranyos/optional)](https://goreportcard.com/report/github.com/kristofaranyos/optional)
 
 [comment]: # (TODO: add CI job for build and codecov, then add badges for both)
 
