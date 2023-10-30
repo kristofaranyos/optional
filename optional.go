@@ -22,6 +22,14 @@ func Empty[Type any]() T[Type] {
 	}
 }
 
+func Maybe[Type any](condition bool, data Type) T[Type] {
+	if !condition {
+		return Empty[Type]()
+	}
+
+	return New(data)
+}
+
 func NewPointer[Type any](data *Type) T[Type] {
 	if data == nil {
 		return Empty[Type]()

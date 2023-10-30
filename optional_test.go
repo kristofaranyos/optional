@@ -12,6 +12,8 @@ const (
 	defaultValueString = ""
 	stringVal          = "an example string"
 	elseString         = "something else"
+	trueCondition      = true
+	falseCondition     = false
 )
 
 var stringVar = stringVal
@@ -42,6 +44,22 @@ func TestEmpty(t *testing.T) {
 
 	assert.False(t, o.isSet)
 	assert.Equal(t, defaultValueString, o.data)
+}
+
+func TestMaybe(t *testing.T) {
+	t.Run("true condition", func(t *testing.T) {
+		o := Maybe(trueCondition, stringVal)
+
+		assert.True(t, o.isSet)
+		assert.Equal(t, stringVal, o.data)
+	})
+
+	t.Run("false condition", func(t *testing.T) {
+		o := Maybe(falseCondition, stringVal)
+
+		assert.False(t, o.isSet)
+		assert.Equal(t, defaultValueString, o.data)
+	})
 }
 
 func TestNewPointer(t *testing.T) {
